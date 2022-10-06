@@ -3,7 +3,7 @@ import plot_simplex
 
 T = 5001
 game = RPS_exp3(0.005, [0.333334, 0.333333, 0.333333], T)
-game = RPS_exp3(0.03, [0.1, 0.8, 0.1], T)
+game = RPS_exp3(0.03, [0.3, 0.4, 0.3], T)
 
 game.run()
 

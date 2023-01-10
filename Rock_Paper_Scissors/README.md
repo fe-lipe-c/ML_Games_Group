@@ -1,4 +1,4 @@
-# Rock-Paper-Scissors Game
+#	 Rock-Paper-Scissors Game
 
 ### RPS Definition
 
@@ -11,3 +11,4 @@ In the Rock-Paper-Scissors game (RPS), two players simultaneously choose one of 
 It's a fairly simple game that can be used as an environment to implement learning algorithms.
 
 From a game t
+

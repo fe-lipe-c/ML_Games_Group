@@ -10,9 +10,9 @@ Rock-Paper-Scissors (RPS) is a fairly simple game that can be used as an environ
 
 We can model this game in the bandit framework. A bandit problem can be defined as follows:
 
-**Definition 1 (Bandit Problem)** A bandit problem is a tuple $(\mathcal{A}, \mathcal{C}, \mathcal{R})$, where $\mathcal{A}$ is the set of arms (or actions), $\mathcal{C}$ is the set of contexts and $\mathcal{R}: \mathcal{A} \times \mathcal{C} \to \mathbb{R}$ is the reward function. 
+**Definition 1 (Bandit Problem)** A bandit problem is a tuple $(\mathcal{A},\Pi ,\mathcal{C}, \mathcal{R})$, where $\mathcal{A}$ is the set of arms (or actions), $\mathcal{C}$ is the set of contexts and $\mathcal{R}: \mathcal{A} \times \mathcal{C} \to \Delta(\mathbb{R})$ is the reward function, where $\Delta(\mathbb{R})$ is the space of probability distributions over $\mathbb{R}$. 
 
-This is a sequential decision problem where a learner interacts with an environment over $n$ rounds, $n \in \mathbb{N}$. In each round $t \in [n]$ the learner receives a context $c_{t} \in \mathcal{C}$, that can be seen as the state of the environment, chooses an action $a_{t} \in \mathcal{A}$ and the environment then reveals a reward $\mathcal{R}(a_{t}, c_{t}) = x_{t} \in \mathbb{R}$.  
+This is a sequential decision problem where a learner interacts with an environment over $n$ rounds, $n \in \mathbb{N}$. In each round $t \in [n]$ the learner receives a context $c_{t} \in \mathcal{C}$, that can be seen as the state of the environment, chooses an action $a_{t} \in \mathcal{A}$ and the environment then reveals a reward $x_{t} \sim \mathcal{R}(a_{t}, c_{t})$.  
 
 The context space can be unitary, resulting in the irrelevance of the context for the agent's decision making. Thus we can define $\mathcal{R}(a,c) = \mathcal{R}(a)$, for $c \in \mathcal{C}$ and every $a \in \mathcal{A}$, incorporating the only context to the law of the rewards. This happens in the classic slot machine example, where the learner has $K$ arms to chose from, and the context doesn't matter. On the other hand, if we would play the same kinds of $K$ slot machines, but in one round we would play in Bangu, Brazil, and in the other in Las Vegas, US, then we would have different context that would affect the reward.
 

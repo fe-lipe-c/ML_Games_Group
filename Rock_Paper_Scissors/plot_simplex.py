@@ -76,6 +76,7 @@ class plot:
                     axis=None,
                 ),
             )
+            .properties(width=800, height=800)
         )  # order="order")
         self.total_chart = self.base_chart + self.chart_history
         self.total_chart.configure_axis(grid=False).configure_view(strokeWidth=0)

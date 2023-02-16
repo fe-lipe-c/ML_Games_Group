@@ -44,16 +44,31 @@ The strategy is set by a policy "function $\pi : ([k]\times [0,1])^{*} \to \math
 
 We can evaluate the learner's policy by using the regret, that can be defined in different ways. In the stochastic setting the learner's policy is evaluated relative to the best policy $\pi^{*}$, whereas in the adversarial case we compare the learner's actions with the best actions in hindsight.
 $$
-\begin{equation*}
-	R_{n}(\pi) = \max_{i \in [k]}\sum_{t=1}^{n}x_{ti} - \mathbb{E}_{\pi}\left[ \sum_{t=1}^{n}x_{tA_{t}} \right]
-\end{equation*}
+\begin{align*}
+	R_{n}(\pi) = n \max_{i \in [k]} \mu_{i} - \mathbb{E}\left[\sum_{t=1}^{n}x_{t}\right] \qquad \text{(Stochastic Regret)}
+\end{align*}
+$$
+$$
+\begin{align*}
+	R_{n}(\pi) = \max_{i \in [k]}\sum_{t=1}^{n}x_{ti} - \mathbb{E}_{\pi}\left[ \sum_{t=1}^{n}x_{tA_{t}} \right] \qquad \text{(Adversarial Regret)} 
+\end{align*}
 $$
 
+### Exp3 Algorithm
+
+The Exp3 (Exponential-weight algorithm for exploration and exploitation) is an adversarial Bandit Algorithm. Consider a policy $\pi$ such that, for action $i$ at time $t$,
+$$ \pi_{i,t} = \mathbb{P}(A_t = i | A_1,R_1,\dots,A_{t-1},R_{t-1})$$
+where $\pi_{i,t}>0$, for all $i$ and $t$. The importance-weighted estimator of $r_{i,t}$, the mean reward of action $i$ at time $t$, is
+$$\hat{X} = \frac{\mathbb{I}\{A_{t} = i\} R_{t}}{\pi_{i,t}}$$
+This is an unbiased estimate of $x_{i,t}$ conditioned on the history observed after $t-1$ rounds. Indeed,
 $$
-\begin{equation*}
-	R_{n}(\pi) = n \max_{i \in [k]} \mu_{i} - \mathbb{E}\left[\sum_{t=1}^{n}x_{t}\right]
-\end{equation*}
+\begin{align*}
+	\mathbb{E}\left[\hat{X}\right] = \mathbb{E}\left[\mathbb{I}\{A_{t} = i\}\right] \frac{\mathbb{E}[R_{t}]
+}{\pi_{i,t}}\end{align*}
 $$
 
-**Definition 2 (Regret - Stochastic Bandit - Lattimore & Szepesvari)** The regret of the learner relative to the policy $\pi^{*}$ is the difference between the total expected reward using policy $\pi^{*}$ for $n$ rounds and the total expected reward collected by the learner over $n$ rounds.
+### Simulation
 
+Using the Exp3 Algorithm, we simulate a RPS game with one adversary that has a fixed policy. The game is played over 5000 rounds, the adversary's policy is $\pi_{0} = [\pi_{0,\tiny R}, \pi_{0,\tiny P}, \pi_{0,\tiny S}] = [0.3,0.4,0.3]$ and the learner's learning rate is $0.1$. The following figure a path for the learner's policy.
+
+![Learner's Policy](img/learner_policy.png)

@@ -24,7 +24,6 @@ The reward associated with the action chosen are always revealed and the rewards
 The way the reward function behaves determines the type of bandit problem that the learner is facing. If the reward function remains the same regardless of the learner's actions, then the learner is facing a stochastic bandit problem. Onth the other way, if the reward function adapts to the learner's actions, then the learner is facing a adversarial bandit problem. One example for the former are $K$ slot machines and one for the later is the RPS game.
 
 Returning to the RPS game, we set the tuple $(\mathcal{A}, \mathcal{C}, \mathcal{R})$ as follows: $\mathcal{A} = \{R,P,S\}$, $\mathcal{C} = \{I_{1}, I_{2}, \dots\}$, the set of different adversaries, and the reward functions is defined as follows:
-
 $$
 \begin{align*}
 \mathcal{R}(R,I_{j}) = [\pi_{j,R}(0),\pi_{j,P}(-1),\pi_{j,S}(1)]\\

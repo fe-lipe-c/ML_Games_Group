@@ -32,7 +32,7 @@ $$
 \mathcal{R}(S,I_{j}) = [\pi_{j,R}(-1),\pi_{j,P}(1),\pi_{j,S}(0)]
 \end{align*}
 $$
-where $\pi_{j,A}$ is the adversary j's probability of playing action $A$ (adversary policy) and the number in parentesis is the outcome if this action is choosen. This is a Game Theory notation for a lottery. In this case, each time the learner choses an action, she is actually choosing a lottery over the outcomes $\left\{-1,0,1 \right\}$
+where $\pi_{j,A}$ is the adversary j's probability of playing action $A$ (adversary policy) and the number in parentesis is the outcome if this action is choosen. This is a Game Theory notation for a lottery. In this case, each time the learner choses an action, she is actually choosing a lottery over the outcomes $\{-1,0,1 \}$
 
 #### Learner's Objective and Policy
 

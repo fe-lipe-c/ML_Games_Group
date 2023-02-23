@@ -15,13 +15,13 @@ We can model this game in the bandit framework. A bandit problem can be defined 
 
 This is a sequential decision problem where a learner interacts with an environment over $n$ rounds, $n \in \mathbb{N}$. In each round $t \in [n]$ the learner receives a context $c_{t} \in \mathcal{C}$, that can be seen as the state of the environment, chooses an action $a_{t} \in \mathcal{A}$ and the environment then reveals a reward $x_{t} \sim \mathcal{R}(a_{t}, c_{t})$.  
 
-The context space can be unitary, resulting in the irrelevance of the context for the agent's decision making. Thus we can define $\mathcal{R}(a,c) = \mathcal{R}(a)$, for $c \in \mathcal{C}$ and every $a \in \mathcal{A}$, incorporating the only context to the law of the rewards. This happens in the classic slot machine example, where the learner has $K$ arms to chose from, and the context doesn't matter. On the other hand, for example, if we would play the same $K$ slot machines, but in one round we would play them in Bangu, Brazil, and in the other in Las Vegas, US, then we would have different context that would may affect the reward.
+The context space can be unitary, resulting in the irrelevance of the context for the agent's decision making. Thus we can define $\mathcal{R}(a,c) = \mathcal{R}(a)$, for $c \in \mathcal{C}$ and every $a \in \mathcal{A}$, incorporating the only context to the law of the rewards. This happens in the classic slot machine example, where the learner has $K$ arms to chose from, and the context doesn't matter. On the other hand, for example, if we would play the same $K$ slot machines, but in different geographical regions, then we would have different context that could affect the reward.
 
 Another remark about the context is that $\mathbb{P}(c_{t+1}|c_{t},a_{t}) = \mathbb{P}(c_{t+1}|c_{t})$, for every $t \in [n]$. This means that the learner has no influence over the context dynamics. This contrasts with the Reinforcement Learning (RL) framework, where the learner can influence the state dynamics through her actions. 
 
 The reward associated with the action chosen are always revealed and the rewards associated with the other actions not chosen may or may not be revealed to the learner. The later, when revealed, is an important information to the learner, since she can make a better update of the estimated reward distribution for each arm, even if she never play most of them.
 
-The way the reward function behaves determines the type of bandit problem that the learner is facing. If the reward function remains the same regardless of the learner's actions, then the learner is facing a stochastic bandit problem. Onth the other way, if the reward function adapts to the learner's actions, then the learner is facing a adversarial bandit problem. One example for the former are $K$ slot machines and one for the later is the RPS game.
+The way the reward function behaves determines the type of bandit problem that the learner is facing. If the reward function remains the same regardless of the learner's actions, then the learner is facing a stochastic bandit problem. On the other hand, if the reward function adapts to the learner's actions, then the learner is facing a adversarial bandit problem. Other way to see an adversarial bandit is that at each round the adversary chooses the reward to each action. One example for the former are $K$ slot machines and one for the later is the RPS game.
 
 Returning to the RPS game, we set the tuple $(\mathcal{A}, \mathcal{C}, \mathcal{R})$ as follows: $\mathcal{A} = \{R,P,S\}$, $\mathcal{C} = \{I_{1}, I_{2}, \dots\}$, the set of different adversaries, and the reward functions is defined as follows:
 $$
@@ -37,9 +37,9 @@ where $\pi_{j,A}$ is the adversary j's probability of playing action $A$ (advers
 
 The objective of the learner is to maximize her total reward $S_{n} = \sum_{t=1}^{n}X_{t}$.
 
-Given the bandit problem, the learner needs a strategy to make the best decisions, with the aim to maximize her total reward. Since the learner is constranted by a finite number of interactions with the environment, she has to balance exploration with exploitation. Exploration is needed to gather data over actions, with the objective of finding the best action (or set of best actions), while exploitation is required to extract the maximum amount of reward from the environment.
+Given the bandit problem, the learner needs a strategy to make the best decisions, with the aim to maximize her total reward. Since the learner is constrained by a finite number of interactions with the environment, she has to balance exploration with exploitation. Exploration is needed to gather data over actions, with the objective of finding the best action (or set of best actions), while exploitation is required to extract the maximum amount of reward from the environment, by choosing the best (inferred) action.
 
-The strategy is set by a policy "function $\pi : ([k]\times [0,1])^{*} \to \mathcal{P_{k-1}}$, mapping history sequences to distributions over actions (regardless of measurability)."
+The strategy is set by a policy "function $\pi : ([k]\times [0,1])^{*} \to \mathcal{P_{k-1}}$, mapping history sequences to distributions over actions (regardless of measurability)." (Lattimore & Szepesvari)
 
 We can evaluate the learner's policy by using the regret, that can be defined in different ways. In the stochastic setting the learner's policy is evaluated relative to the best policy $\pi^{*}$, whereas in the adversarial case we compare the learner's actions with the best actions in hindsight.
 $$
@@ -57,14 +57,19 @@ $$
 
 The Exp3 (Exponential-weight algorithm for exploration and exploitation) is an adversarial Bandit Algorithm. Consider a policy $\pi$ such that, for action $i$ at time $t$,
 $$ \pi_{i,t} = \mathbb{P}(A_t = i | A_1,R_1,\dots,A_{t-1},R_{t-1})$$
-where $\pi_{i,t}>0$, for all $i$ and $t$. The importance-weighted estimator of $r_{i,t}$, the mean reward of action $i$ at time $t$, is
-$$\hat{X} = \frac{\mathbb{I}\{A_{t} = i\} R_{t}}{\pi_{i,t}}$$
-This is an unbiased estimate of $x_{i,t}$ conditioned on the history observed after $t-1$ rounds. Indeed,
+where $\pi_{i,t}>0$, for all $i$ and $t$. Consider that the learner only observes the reward of the action sampled from her policy. The importance-weighted estimator of $r_{i,t}$, the true reward of action $i$ at time $t$, is
+$$
+\hat{R}_{i,t} = \frac{\mathbb{I}_{\{A_{t} = i\}} R_{t}}{\pi_{i,t}},
+$$
+This is an unbiased estimate of $r_{i,t}$ conditioned on the history observed after $t-1$ rounds. Indeed,
 $$
 \begin{align*}
-	\mathbb{E}\left[\hat{X}\right] = \mathbb{E}\left[\mathbb{I}\{A_{t} = i\}\right] \frac{\mathbb{E}[R_{t}]
-}{\pi_{i,t}}\end{align*}
+	\mathbb{E}\left[\hat{R}_{i,t}|A_1,R_1,\dots,A_{t-1},R_{t-1}\right] &= \mathbb{E}_{t}\left[\hat{R}_{i,t}\right] \\
+	&= \mathbb{E}_{t}\left[\frac{\mathbb{I}_{\{A_{t} = i\}} R_{t}}{\pi_{i,t}}\right]\\
+	&= \mathbb{E}_{t}\left[\mathbb{I}_{\{A_{t} = i\}}\right] \frac{\mathbb{E}[R_{t}]}{\pi_{i,t}} = r_{i,t}
+\end{align*}
 $$
+Now consider $\hat{S}_{i,t} = \sum_{s=1}^{t}\hat{R}_{i,t}$, the total estimated reward for action $i$ by the end of round $t$.
 
 ### Simulation
 

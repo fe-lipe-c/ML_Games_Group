@@ -59,17 +59,35 @@ The Exp3 (Exponential-weight algorithm for exploration and exploitation) is an a
 $$ \pi_{i,t} = \mathbb{P}(A_t = i | A_1,R_1,\dots,A_{t-1},R_{t-1})$$
 where $\pi_{i,t}>0$, for all $i$ and $t$. Consider that the learner only observes the reward of the action sampled from her policy. The importance-weighted estimator of $r_{i,t}$, the true reward of action $i$ at time $t$, is
 $$
+\begin{equation}
 \hat{R}_{i,t} = \frac{\mathbb{I}_{\{A_{t} = i\}} R_{t}}{\pi_{i,t}},
+\end{equation}
 $$
 This is an unbiased estimate of $r_{i,t}$ conditioned on the history observed after $t-1$ rounds. Indeed,
 $$
 \begin{align*}
 	\mathbb{E}\left[\hat{R}_{i,t}|A_1,R_1,\dots,A_{t-1},R_{t-1}\right] &= \mathbb{E}_{t}\left[\hat{R}_{i,t}\right] \\
 	&= \mathbb{E}_{t}\left[\frac{\mathbb{I}_{\{A_{t} = i\}} R_{t}}{\pi_{i,t}}\right]\\
-	&= \mathbb{E}_{t}\left[\mathbb{I}_{\{A_{t} = i\}}\right] \frac{\mathbb{E}[R_{t}]}{\pi_{i,t}} = r_{i,t}
+	&= \mathbb{E}_{t}\left[\mathbb{I}_{\{A_{t} = i\}}\right] \frac{\mathbb{E}[R_{t}]}{\pi_{i,t}}\\
+	&= r_{i,t}
 \end{align*}
 $$
-Now consider $\hat{S}_{i,t} = \sum_{s=1}^{t}\hat{R}_{i,t}$, the total estimated reward for action $i$ by the end of round $t$.
+Despite being a unbiased estimator, it may be a high variance estimator. Its variance is $\mathbb{V}[\hat{R}_{i,t}]= \frac{r^{2}_{i,t}(1-\pi_{i,t})}{\pi_{i,t}}$, that can be extremely large when $\pi_{i,t}$ is small and $r_{i,t}$ is bounded away from zero [Lattimore & Szepesvari]. An alternative unbiased estimator is
+$$
+\begin{equation}
+	\hat{R}_{i,t} = 1 - \frac{\mathbb{I}_{\left\{A_{t}=i \right\}}}{\pi_{i,t}}(1- R_{t})
+\end{equation}
+$$
+ 
+Now consider $\hat{S}_{i,t} = \sum_{s=1}^{t}\hat{R}_{i,t}$, the total estimated reward for action $i$ by the end of round $t$. We can use this estimate to update the policy $\pi_{i,t}$, by using the following update rule:
+$$
+\begin{equation*}
+	\pi_{i,t} = \frac{ \exp\left(\eta\hat{S}_{i,t-1}\right)}{\sum_{j=1}^{k}\exp\left(\eta\hat{S}_{j,t-1}\right)}
+\end{equation*}
+$$
+where $\eta$ is the exploitation rate: when is high, it favors exploitation, while when is low it favors exploration. This hyperparameter can be fixed or vary through time, thus depending on the number of arms and/or the horizon. The EXP3 algorithm is summarized in the following figure, using the alternative estimator for $r_{i,t}$.
+
+![Exp3 Algorithm](img/exp_algo.png)
 
 ### Simulation
 

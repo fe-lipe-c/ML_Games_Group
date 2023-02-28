@@ -8,11 +8,18 @@ import altair as alt
 class plot:
     """Plot probability simplex and the a policy trajectory."""
 
-    def __init__(self, policy_history):
+    def __init__(self, policy_history, width=400, height=400):
         """Initialize setup."""
+        self.width = width
+        self.height = height
         self.policy_history = policy_history
         self.base()
         self.transform_ternary_plot()
+        self.rock_text = pd.DataFrame([{"start": 0, "end": 0, "action": "R"}])
+        self.paper_text = pd.DataFrame([{"start": 1, "end": 0, "action": "P"}])
+        self.scissors_text = pd.DataFrame(
+            [{"start": 0.5, "end": np.sqrt(3) / 2, "action": "S"}]
+        )
         self.plot_history()
 
     def base(self):
@@ -76,7 +83,53 @@ class plot:
                     axis=None,
                 ),
             )
-            .properties(width=800, height=800)
+            .properties(width=self.width, height=self.height)
         )  # order="order")
-        self.total_chart = self.base_chart + self.chart_history
+        self.chart_text_R = (
+            alt.Chart(self.rock_text)
+            .mark_text(align="right", size=15, dx=-5)
+            .encode(
+                alt.X("start:Q"),
+                alt.Y("end:Q"),
+                text="action:N",
+            )
+        )
+        self.chart_text_P = (
+            alt.Chart(self.paper_text)
+            .mark_text(align="left", size=15, dx=5)
+            .encode(
+                alt.X("start:Q"),
+                alt.Y("end:Q"),
+                text="action:N",
+            )
+        )
+        self.chart_text_S = (
+            alt.Chart(self.scissors_text)
+            .mark_text(size=15, dy=-10)
+            .encode(
+                alt.X("start:Q"),
+                alt.Y("end:Q"),
+                text="action:N",
+            )
+        )
+        self.total_chart = (
+            self.base_chart
+            + self.chart_history
+            + self.chart_text_R
+            + self.chart_text_P
+            + self.chart_text_S
+        )
         self.total_chart.configure_axis(grid=False).configure_view(strokeWidth=0)
+
+
+from utils import RPS_exp3
+
+T = 5001  # game horizon
+adv_strategy = [0.1, 0.1, 0.8]  # adversary strategy [Rock, Paper, Scissors]
+learning_rate = 0.1
+
+game = RPS_exp3(learning_rate, adv_strategy, T)
+game.run()
+
+chart_simplex = plot(game.policy_history)
+chart_simplex.total_chart.save("charts/simplex_path.html")

@@ -15,6 +15,15 @@ class plot:
         self.policy_history = policy_history
         self.base()
         self.transform_ternary_plot()
+        self.start_text = pd.DataFrame(
+            [
+                {
+                    "start": self.policy_history[0][0][0],
+                    "end": self.policy_history[0][0][1],
+                    "action": "Initial Policy",
+                }
+            ]
+        )
         self.rock_text = pd.DataFrame([{"start": 0, "end": 0, "action": "R"}])
         self.paper_text = pd.DataFrame([{"start": 1, "end": 0, "action": "P"}])
         self.scissors_text = pd.DataFrame(
@@ -72,9 +81,10 @@ class plot:
 
     def plot_history(self):
         """Plot policy history."""
-        self.chart_history = (
-            alt.Chart(self.df_history)
-            .mark_circle(size=6, color="red")
+
+        self.chart_start = (
+            alt.Chart(self.df_history[0:1])
+            .mark_point(size=15, color="black")
             .encode(
                 alt.X("x", scale=alt.Scale(domain=[0, 1]), axis=None),
                 alt.Y(
@@ -82,6 +92,20 @@ class plot:
                     scale=alt.Scale(domain=[0, np.sqrt(3) / 2]),
                     axis=None,
                 ),
+            )
+            .properties(width=self.width, height=self.height)
+        )  # order="order")
+        self.chart_history = (
+            alt.Chart(self.df_history)
+            .mark_line(color="red")
+            .encode(
+                alt.X("x", scale=alt.Scale(domain=[0, 1]), axis=None),
+                alt.Y(
+                    "y",
+                    scale=alt.Scale(domain=[0, np.sqrt(3) / 2]),
+                    axis=None,
+                ),
+                order="order",
             )
             .properties(width=self.width, height=self.height)
         )  # order="order")
@@ -112,24 +136,22 @@ class plot:
                 text="action:N",
             )
         )
+        self.chart_text_start = (
+            alt.Chart(self.start_text)
+            .mark_text(size=8, dx=10, dy=10, align="left", baseline="top")
+            .encode(
+                alt.X("start:Q"),
+                alt.Y("end:Q"),
+                text="action:N",
+            )
+        )
         self.total_chart = (
             self.base_chart
             + self.chart_history
+            + self.chart_start
             + self.chart_text_R
             + self.chart_text_P
             + self.chart_text_S
+            + self.chart_text_start
         )
         self.total_chart.configure_axis(grid=False).configure_view(strokeWidth=0)
-
-
-from utils import RPS_exp3
-
-T = 5001  # game horizon
-adv_strategy = [0.1, 0.1, 0.8]  # adversary strategy [Rock, Paper, Scissors]
-learning_rate = 0.1
-
-game = RPS_exp3(learning_rate, adv_strategy, T)
-game.run()
-
-chart_simplex = plot(game.policy_history)
-chart_simplex.total_chart.save("charts/simplex_path.html")

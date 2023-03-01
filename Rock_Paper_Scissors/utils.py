@@ -35,7 +35,11 @@ class RPS_exp3:
         self.T = T
         self.total_reward = np.zeros(self.arms)
         self.policy = np.ones(self.arms) / self.arms
+        # self.policy = np.random.rand(3)
+        # self.policy = self.policy / self.policy.sum()
         self.policy_history = []
+        self.regret = []
+        self.true_rewards = []
 
     def reward(self, action, env_action):
         """Return the reward of the action."""
@@ -51,6 +55,11 @@ class RPS_exp3:
         self.policy = np.exp(self.eta * self.total_reward)
         self.policy /= np.sum(self.policy)
 
+    def random_regret(self, reward):
+        """Return the regret of the action."""
+        self.true_rewards.append(reward)
+        self.regret.append(len(self.true_rewards) / 10 - sum(self.true_rewards))
+
     def run(self):
         """Run the Exp3 algorithm."""
         for t in range(self.T):
@@ -59,6 +68,7 @@ class RPS_exp3:
             action = np.random.choice(self.arms, p=self.policy)
             env_action = np.random.choice(self.arms, p=self.env_dist)
             reward = self.reward(action, env_action)
+            self.random_regret(reward)
             self.total_reward[action] += reward / self.policy[action]
 
             if t % ((self.T - 1) / 10) == 0:

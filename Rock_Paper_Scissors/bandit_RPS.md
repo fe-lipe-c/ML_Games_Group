@@ -56,30 +56,30 @@ $$
 ### Exp3 Algorithm
 
 The Exp3 (Exponential-weight algorithm for exploration and exploitation) is an adversarial Bandit Algorithm. Consider a policy $\pi$ such that, for action $i$ at time $t$,
-$$ \pi_{i,t} = \mathbb{P}(A_t = i | A_1,R_1,\dots,A_{t-1},R_{t-1})$$
-where $\pi_{i,t}>0$, for all $i$ and $t$. Consider that the learner only observes the reward of the action sampled from her policy. The importance-weighted estimator of $r_{i,t}$, the true reward of action $i$ at time $t$, is
+$$ \pi_{i,t} = \mathbb{P}(A_t = i | A_1,X_1,\dots,A_{t-1},X_{t-1})$$
+where $\pi_{i,t}>0$, for all $i$ and $t$, and $X_{t}$ is the reward at time $t$. Consider that the learner only observes the reward of the action sampled from her policy. The importance-weighted estimator of $x_{i,t}$, the true reward of action $i$ at time $t$, is
 $$
 \begin{equation}
-\hat{R}_{i,t} = \frac{\mathbb{I}_{\{A_{t} = i\}} R_{t}}{\pi_{i,t}},
+\hat{X}_{i,t} = \frac{\mathbb{I}_{\{A_{t} = i\}} X_{t}}{\pi_{i,t}},
 \end{equation}
 $$
-This is an unbiased estimate of $r_{i,t}$ conditioned on the history observed after $t-1$ rounds. Indeed,
+This is an unbiased estimate of $x_{i,t}$ conditioned on the history observed after $t-1$ rounds. Indeed,
 $$
 \begin{align*}
-	\mathbb{E}\left[\hat{R}_{i,t}|A_1,R_1,\dots,A_{t-1},R_{t-1}\right] &= \mathbb{E}_{t}\left[\hat{R}_{i,t}\right] \\
-	&= \mathbb{E}_{t}\left[\frac{\mathbb{I}_{\{A_{t} = i\}} R_{t}}{\pi_{i,t}}\right]\\
-	&= \mathbb{E}_{t}\left[\mathbb{I}_{\{A_{t} = i\}}\right] \frac{\mathbb{E}[R_{t}]}{\pi_{i,t}}\\
-	&= r_{i,t}
+	\mathbb{E}\left[\hat{X}_{i,t}|A_1,X_1,\dots,A_{t-1},X_{t-1}\right] &= \mathbb{E}_{t}\left[\hat{X}_{i,t}\right] \\
+	&= \mathbb{E}_{t}\left[\frac{\mathbb{I}_{\{A_{t} = i\}} X_{t}}{\pi_{i,t}}\right]\\
+	&= \mathbb{E}_{t}\left[\mathbb{I}_{\{A_{t} = i\}}\right] \frac{\mathbb{E}[X_{t}]}{\pi_{i,t}}\\
+	&= x_{i,t}
 \end{align*}
 $$
-Despite being a unbiased estimator, it may be a high variance estimator. Its variance is $\mathbb{V}[\hat{R}_{i,t}]= \frac{r^{2}_{i,t}(1-\pi_{i,t})}{\pi_{i,t}}$, that can be extremely large when $\pi_{i,t}$ is small and $r_{i,t}$ is bounded away from zero [Lattimore & Szepesvari]. An alternative unbiased estimator is
+Despite being a unbiased estimator, it may be a high variance estimator. Its variance is $\mathbb{V}[\hat{X}_{i,t}]= \frac{x^{2}_{i,t}(1-\pi_{i,t})}{\pi_{i,t}}$, that can be extremely large when $\pi_{i,t}$ is small and $x_{i,t}$ is bounded away from zero [Lattimore & Szepesvari]. An alternative unbiased estimator is
 $$
 \begin{equation}
-	\hat{R}_{i,t} = 1 - \frac{\mathbb{I}_{\left\{A_{t}=i \right\}}}{\pi_{i,t}}(1- R_{t})
+	\hat{X}_{i,t} = 1 - \frac{\mathbb{I}_{\left\{A_{t}=i \right\}}}{\pi_{i,t}}(1- X_{t})
 \end{equation}
 $$
  
-Now consider $\hat{S}_{i,t} = \sum_{s=1}^{t}\hat{R}_{i,t}$, the total estimated reward for action $i$ by the end of round $t$. We can use this estimate to update the policy $\pi_{i,t}$, by using the following update rule:
+Now consider $\hat{S}_{i,t} = \sum_{s=1}^{t}\hat{X}_{i,t}$, the total estimated reward for action $i$ by the end of round $t$. We can use this estimate to update the policy $\pi_{i,t}$, by using the following update rule:
 $$
 \begin{equation*}
 	\pi_{i,t} = \frac{ \exp\left(\eta\hat{S}_{i,t-1}\right)}{\sum_{j=1}^{k}\exp\left(\eta\hat{S}_{j,t-1}\right)}
@@ -92,6 +92,31 @@ where $\eta$ is the exploitation rate: when is high, it favors exploitation, whi
 ### Simulation
 #### Stochastic Setting
 
-Using the Exp3 Algorithm, we simulate a RPS game with one adversary that has a fixed policy. The game is played over 5000 rounds, the adversary's policy is $\pi^{0} = [\pi_{\tiny R}^{0}, \pi_{\tiny P}^{0}, \pi_{\tiny S}^{0}] = [0.3,0.4,0.3]$ and the learner's exploitation rate is $0.1$. The following figure a path for the learner's policy.
+Using the Exp3 Algorithm, we simulate a RPS game with one adversary that has a fixed policy. The game is played over $300$ rounds, the adversary's policy is $\pi^{0} = [\pi_{\tiny R}^{0}, \pi_{\tiny P}^{0}, \pi_{\tiny S}^{0}] = [0.55 ,0.40 , 0.05]$ and the learner's exploitation rate is $0.4$. The rewards are multiplied by $0.1$ to scale them down. The following figure shows the path for the learner's policy through the $300$ rounds.
 
-![Learner's Policy](img/learner_policy.png)
+$\qquad \qquad \qquad \qquad$ ![Learner's Policy Path](img/policy_path_1.png)
+
+To use the regret to measure how well this policy performs, we define the following regret functions:
+$$
+\begin{equation*}
+	\hat{R}_{n} = n \mu^{*} - \sum_{t=1}^{n} X_{t} \qquad \text{(random regret)}
+\end{equation*}
+$$
+$$
+\begin{equation*}
+	\bar{R}_{n} = n \mu^{*} -  \sum_{t=1}^{n} \mu_{A_{t}} \qquad \text{(pseudo-regret)}
+\end{equation*}
+$$
+where $\mu^{*}$ is the mean reward of the best action. We will use the pseudo-regret to measure the performance of the Exp3 algorithm. For our example we have $\mu = [\mu_{R}, \mu_{P}, \mu_{S}] = [-0.035, 0.05, -0.015] \implies \mu^{*}= 0.05$.
+
+$\qquad \qquad \qquad \qquad$ ![Regret](img/regret_1.png)
+
+We can see that the regret is decreasing until it stabilizes below $2.4$. 
+
+We can see another example where the adversary fixed policy is more balanced, like $\pi^{0} = [0.35 ,0.40 , 0.25]$. In this case, the mean for each action is: $\mu_{R} = -0.01$, $\mu_{P} = 0.015$, $\mu_{S} = -0.005 \implies \mu^{*} = \mu_{P}$. Different from the previous example, playing paper as the optimal action is not obvious, observation that reveals itself when we simulate the game, where the learner takes time to find the optimal policy. The figure below shows the performance of a lerner in this environment, through $300$ rounds with a exploitation rate of $0.4$.
+
+$\qquad \qquad \qquad \qquad$ ![Policy Path - Regret](img/path_regret_2.png)
+
+#### Adversarial Setting 
+
+In the adversarial setting we have a real game, where the adversary responds to the learner's actions, adapting its own policy following some objective, like maximizing its own total rewards. 

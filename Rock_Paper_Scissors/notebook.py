@@ -5,8 +5,8 @@ import plot_simplex
 import pandas as pd
 import altair as alt
 
-T = 3001  # game horizon
-adv_strategy = [0.1, 0.7, 0.2]  # adversary strategy [Rock, Paper, Scissors]
+T = 300  # game horizon
+adv_strategy = [0.4, 0.35, 0.25]  # adversary strategy [Rock, Paper, Scissors]
 learning_rate = 0.4
 
 game = RPS_exp3(learning_rate, adv_strategy, T)
@@ -15,12 +15,18 @@ game.run()
 chart_simplex = plot_simplex.plot(game.policy_history)
 chart_simplex.total_chart.save("charts/simplex_path_test.html")
 
-game.true_rewards
+[round(i, 4) for i in game.env_mean]
 
 df = pd.DataFrame()
 df["regret"] = game.regret
 df["true_rewards"] = game.true_rewards
 df["index"] = df.index
 
-chart = alt.Chart(df).mark_line().encode(alt.X("index"), alt.Y("regret"))
+chart = (
+    alt.Chart(df)
+    .mark_line()
+    .encode(alt.X("index", title="round"), alt.Y("regret", title="pseudo-regret"))
+)
 chart.save("charts/regret.html")
+teste = chart_simplex.total_chart.properties(width=300, height=300) | chart
+teste.save("charts/simplex_regret.html")

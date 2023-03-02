@@ -5,8 +5,8 @@ game, where the adversary is a fixed strategy.
 """
 
 import numpy as np
-import pandas as pd
-import altair as alt
+import math
+import scipy.special as sp
 
 
 class RPS_exp3:
@@ -40,6 +40,8 @@ class RPS_exp3:
         self.policy_history = []
         self.regret = []
         self.true_rewards = []
+        self.actions_exp = 0
+        self.arms_means()
 
     def reward(self, action, env_action):
         """Return the reward of the action."""
@@ -50,15 +52,26 @@ class RPS_exp3:
         else:  # Player 1 loses
             return -0.1
 
+    def arms_means(self):
+        """Return the mean reward of each arm."""
+        mu_R = self.env_dist[0] * 0 + self.env_dist[1] * -0.1 + self.env_dist[2] * 0.1
+        mu_P = self.env_dist[0] * 0.1 + self.env_dist[1] * 0 + self.env_dist[2] * -0.1
+        mu_S = self.env_dist[0] * -0.1 + self.env_dist[1] * 0.1 + self.env_dist[2] * 0
+        self.env_mean = [mu_R, mu_P, mu_S]
+
     def policy_update(self):
         """Update the policy."""
-        self.policy = np.exp(self.eta * self.total_reward)
+
+        x = self.eta * self.total_reward
+        self.policy = np.exp(x - sp.logsumexp(x))
         self.policy /= np.sum(self.policy)
 
-    def random_regret(self, reward):
+    def pseudo_regret(self, action):
         """Return the regret of the action."""
-        self.true_rewards.append(reward)
-        self.regret.append(len(self.true_rewards) / 10 - sum(self.true_rewards))
+        self.actions_exp += self.env_mean[action]
+        self.regret.append(
+            len(self.true_rewards) * max(self.env_mean) - self.actions_exp
+        )
 
     def run(self):
         """Run the Exp3 algorithm."""
@@ -68,7 +81,8 @@ class RPS_exp3:
             action = np.random.choice(self.arms, p=self.policy)
             env_action = np.random.choice(self.arms, p=self.env_dist)
             reward = self.reward(action, env_action)
-            self.random_regret(reward)
+            self.true_rewards.append(reward)
+            self.pseudo_regret(action)
             self.total_reward[action] += reward / self.policy[action]
 
             if t % ((self.T - 1) / 10) == 0:

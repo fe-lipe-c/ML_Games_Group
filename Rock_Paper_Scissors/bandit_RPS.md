@@ -117,6 +117,8 @@ We can see another example where the adversary fixed policy is more balanced, li
 
 $\qquad \qquad \qquad \qquad$ ![Policy Path - Regret](img/path_regret_2.png)
 
+Note that the Exp3 algorithm does not take into account the rewards of the actions not played to update the policy, only using the reward realized. This is inefficient, since the learner is not using all available information to maximize her total return.
+
 #### Adversarial Setting 
 
 In the adversarial setting we have a real game, where the adversary responds to the learner's actions, adapting its own policy following some objective, like maximizing its own total rewards. In the figure below the learner plays with an adversary that uses the Exp3 algorithm to update its policy, in the same way as the learner. 

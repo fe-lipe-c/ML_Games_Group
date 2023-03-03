@@ -119,4 +119,16 @@ $\qquad \qquad \qquad \qquad$ ![Policy Path - Regret](img/path_regret_2.png)
 
 #### Adversarial Setting 
 
-In the adversarial setting we have a real game, where the adversary responds to the learner's actions, adapting its own policy following some objective, like maximizing its own total rewards. 
+In the adversarial setting we have a real game, where the adversary responds to the learner's actions, adapting its own policy following some objective, like maximizing its own total rewards. In the figure below the learner plays with an adversary that uses the Exp3 algorithm to update its policy, in the same way as the learner. 
+
+$\qquad \qquad \qquad \qquad$ ![Policy Path - Adversarial](img/adversarial_1.png)
+
+We can see that the adversary starts with a high probability of playing Rock, and the leaner responds by increasing its probability of playing Paper, followed by the adversary increasing its probability of playing Scissors, and so on. Because of the high variance of the Exp3 algorithm, the trajectories of the policies are not smooth and an equilibrium is highly unlikely, but the overall trend is clear.
+
+#### Conclusion
+
+In conclusion, bandit algorithms such as the Exp3 algorithm are useful tools for solving problems where we must make decisions under uncertainty. By balancing the exploration and exploitation of different options, these algorithms can learn which actions yield the highest rewards. As demonstrated in the rock, paper, scissors game, the Exp3 algorithm is able to learn and adapt to its opponent's behavior, allowing it to achieve a decent performance. Overall, bandit algorithms offer a good approach for optimizing decision-making in a some applications.
+
+#### Resources
+
+In calculating the exponentials of the Exp3 algorithm, I got some numerical instability. To stabilize it, I used the approach presente [here](https://gregorygundersen.com/blog/2020/02/09/log-sum-exp/). In, addition, the book Bandit Algorithms was used as reference, from where I got the algorithm framework and some of the definitions.

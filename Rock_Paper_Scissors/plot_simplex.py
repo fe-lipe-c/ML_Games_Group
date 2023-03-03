@@ -8,7 +8,14 @@ import altair as alt
 class plot:
     """Plot probability simplex and the a policy trajectory."""
 
-    def __init__(self, policy_history, width=400, height=400):
+    def __init__(
+        self,
+        policy_history,
+        color,
+        width=400,
+        height=400,
+        init_caption="Initial Policy",
+    ):
         """Initialize setup."""
         self.width = width
         self.height = height
@@ -20,7 +27,7 @@ class plot:
                 {
                     "start": self.policy_history[0][0][0],
                     "end": self.policy_history[0][0][1],
-                    "action": "Initial Policy",
+                    "action": init_caption,
                 }
             ]
         )
@@ -29,6 +36,7 @@ class plot:
         self.scissors_text = pd.DataFrame(
             [{"start": 0.5, "end": np.sqrt(3) / 2, "action": "S"}]
         )
+        self.color = color
         self.plot_history()
 
     def base(self):
@@ -84,7 +92,7 @@ class plot:
 
         self.chart_start = (
             alt.Chart(self.df_history[0:1])
-            .mark_point(size=15, color="black")
+            .mark_point(size=25, color="black")
             .encode(
                 alt.X("x", scale=alt.Scale(domain=[0, 1]), axis=None),
                 alt.Y(
@@ -97,7 +105,7 @@ class plot:
         )  # order="order")
         self.chart_history = (
             alt.Chart(self.df_history)
-            .mark_line(color="red")
+            .mark_line(color=self.color)
             .encode(
                 alt.X("x", scale=alt.Scale(domain=[0, 1]), axis=None),
                 alt.Y(

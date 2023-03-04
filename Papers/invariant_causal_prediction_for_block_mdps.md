@@ -74,6 +74,7 @@ $$
 $$
 > What is invariant risk minimization?
 >Invariant Risk Minimization (IRM) is a method for learning a data representation free of spurious correlations. It is based on the assumption that there exists some partition of the training data into experiments, and that the model's predictions take the form $Y^e = \mathbf{w}^\top \bm{\phi}{(X^e)}$. IRM aims to learn a representation $\bm{\phi}$ for which the optimal linear classifier, $\mathbf{w}$, is invariant across experiments, where optimality is defined as minimizing the empirical risk $R^e$. We can then expect this representation and classifier to have low risk in new experiments $e$, which have the same causal structure as the training set.
+https://www.youtube.com/watch?v=iBlCpJmaBh0
 
 > What do you mean by the 'classifier to have low risk in new experiments'?
 > Having low risk in new experiments means that the classifier is expected to perform well on unseen data from experiments that have the same causal structure as the training set. This is because the representation and classifier learned by IRM are invariant across experiments, meaning that they should be able to generalize to new experiments.

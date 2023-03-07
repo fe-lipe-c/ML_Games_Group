@@ -1,4 +1,4 @@
-# Rock-Paper-Scissors
+# [Rock Paper Scissors](Rock-Paper-Scissors)
 ### Learning to play through bandit algorithms
 
 #### Initial Setup

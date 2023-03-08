@@ -1,2 +1,3 @@
 *.html
-# notes.md
+data/
+!/pten_df.csv

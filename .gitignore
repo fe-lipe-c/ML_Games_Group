@@ -1,3 +1,4 @@
 *.html
-data/
+!data/
+/data/*
 !data/pten_df.csv

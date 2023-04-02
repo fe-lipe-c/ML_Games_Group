@@ -13,7 +13,7 @@ from collections import deque
 class RPS_player:
     """RPS_player class."""
 
-    def __init__(self, eta, init_dist, id, deque_size=1000, fixed_policy=False):
+    def __init__(self, eta, init_dist, id, memory_size=1000, fixed_policy=False):
         """Initialize the Exp3 algorithm.
 
         Args:
@@ -25,20 +25,25 @@ class RPS_player:
         self.arms = len(init_dist)
         # self.weighted_estimator = np.zeros(self.arms)
         self.weighted_estimator = [
-            deque(maxlen=deque_size),
-            deque(maxlen=deque_size),
-            deque(maxlen=deque_size),
+            deque(maxlen=memory_size),
+            deque(maxlen=memory_size),
+            deque(maxlen=memory_size),
         ]
+        # Set initial reward 'bias' for the first iteration
         if id == 0:
             self.weighted_estimator[0].append(init_dist[0])
             self.weighted_estimator[1].append(init_dist[1])
             self.weighted_estimator[2].append(init_dist[2])
         self.policy = np.array(init_dist)
         self.policy_history = []
-        self.regret_history = []
         self.rewards_history = []
         self.actions_history = []
         self.fixed_policy = fixed_policy
+
+        # Regret variables
+        self.regret_history = []
+        self.regret_max = []
+        self.actions_exp = 0
 
     def policy_update(self):
         """Update the EXP3 policy."""
@@ -51,6 +56,7 @@ class RPS_player:
                     sum(self.weighted_estimator[2]),
                 ]
             )
+            # Log-sum-exp trick
             x = self.eta * w_array
             self.policy = np.exp(x - sp.logsumexp(x))
             self.policy /= np.sum(self.policy)
@@ -58,8 +64,23 @@ class RPS_player:
             pass
 
     def weighted_estimator_update(self):
+        """Update the weighted estimator.""" ""
         self.weighted_estimator[self.actions_history[-1]].append(
             self.rewards_history[-1] / self.policy[self.actions_history[-1]]
+        )
+
+    def regret_update(self, action, actions_means):
+        """Update the regret."""
+
+        # self.sum_actions_mean = 0
+        self.actions_exp += actions_means[action]
+
+        self.regret_history.append(
+            len(self.rewards_history) * max(actions_means) - self.actions_exp
+        )
+        self.regret_max.append(
+            len(self.rewards_history) * max(actions_means)
+            - len(self.rewards_history) * min(actions_means)
         )
 
 
@@ -110,24 +131,25 @@ class RPS_game:
         else:  # Player 1 loses
             return self.scheme[2]
 
-    # def arms_means(self):
-    #     """Return the mean reward of each arm."""
-    #     mu_R = (
-    #         self.adversary_policy[0] * 0
-    #         + self.adversary_policy[1] * -0.1
-    #         + self.adversary_policy[2] * 0.1
-    #     )
-    #     mu_P = (
-    #         self.adversary_policy[0] * 0.1
-    #         + self.adversary_policy[1] * 0
-    #         + self.adversary_policy[2] * -0.1
-    #     )
-    #     mu_S = (
-    #         self.adversary_policy[0] * -0.1
-    #         + self.adversary_policy[1] * 0.1
-    #         + self.adversary_policy[2] * 0
-    #     )
-    #     return [mu_R, mu_P, mu_S]
+    def arms_means(self, player_i):
+        """Return the mean reward of each arm, by player_i perspective."""
+
+        mu_R = (
+            self.players[len(self.players) - player_i - 1].policy[0] * self.scheme[0]
+            + self.players[len(self.players) - player_i - 1].policy[1] * self.scheme[2]
+            + self.players[len(self.players) - player_i - 1].policy[2] * self.scheme[1]
+        )
+        mu_P = (
+            self.players[len(self.players) - player_i - 1].policy[0] * self.scheme[1]
+            + self.players[len(self.players) - player_i - 1].policy[1] * self.scheme[0]
+            + self.players[len(self.players) - player_i - 1].policy[2] * self.scheme[2]
+        )
+        mu_S = (
+            self.players[len(self.players) - player_i - 1].policy[0] * self.scheme[2]
+            + self.players[len(self.players) - player_i - 1].policy[1] * self.scheme[1]
+            + self.players[len(self.players) - player_i - 1].policy[2] * self.scheme[0]
+        )
+        return [mu_R, mu_P, mu_S]
 
     # def policy_update(self):
     #     """Update the policy."""
@@ -150,9 +172,10 @@ class RPS_game:
             for i in range(len(self.players)):
                 self.players[i].policy_update()
                 self.players[i].policy_history.append([self.players[i].policy])
-                self.players[i].actions_history.append(
-                    np.random.choice(self.arms, p=self.players[i].policy)
-                )
+                action_c = np.random.choice(self.arms, p=self.players[i].policy)
+                self.players[i].actions_history.append(action_c)
+                actions_means = self.arms_means(i)
+
             reward = self.reward(
                 self.players[0].actions_history[-1], self.players[1].actions_history[-1]
             )
@@ -167,8 +190,9 @@ class RPS_game:
             # self.players[1].weighted_estimator[learner_action] += (
             #     -reward / self.players[1].policy[learner_action]
             # )
-            self.players[0].weighted_estimator_update()
-            self.players[1].weighted_estimator_update()
+            for i in range(len(self.players)):
+                self.players[i].weighted_estimator_update()
+                self.players[i].regret_update(action_c, actions_means)
 
             # for i in range(len(self.players)):
             #     self.players[i].policy_update()

@@ -92,7 +92,7 @@ class plot:
 
         self.chart_start = (
             alt.Chart(self.df_history[0:1])
-            .mark_point(size=25, color="black")
+            .mark_point(size=25, color="white")
             .encode(
                 alt.X("x", scale=alt.Scale(domain=[0, 1]), axis=None),
                 alt.Y(
@@ -119,7 +119,7 @@ class plot:
         )  # order="order")
         self.chart_text_R = (
             alt.Chart(self.rock_text)
-            .mark_text(align="right", size=15, dx=-5)
+            .mark_text(align="right", size=15, dx=-5, color="white")
             .encode(
                 alt.X("start:Q"),
                 alt.Y("end:Q"),
@@ -128,7 +128,7 @@ class plot:
         )
         self.chart_text_P = (
             alt.Chart(self.paper_text)
-            .mark_text(align="left", size=15, dx=5)
+            .mark_text(align="left", size=15, dx=5, color="white")
             .encode(
                 alt.X("start:Q"),
                 alt.Y("end:Q"),
@@ -137,7 +137,7 @@ class plot:
         )
         self.chart_text_S = (
             alt.Chart(self.scissors_text)
-            .mark_text(size=15, dy=-10)
+            .mark_text(size=15, dy=-10, color="white")
             .encode(
                 alt.X("start:Q"),
                 alt.Y("end:Q"),
@@ -146,7 +146,9 @@ class plot:
         )
         self.chart_text_start = (
             alt.Chart(self.start_text)
-            .mark_text(size=8, dx=10, dy=10, align="left", baseline="top")
+            .mark_text(
+                size=8, dx=10, dy=10, align="left", baseline="top", color="white"
+            )
             .encode(
                 alt.X("start:Q"),
                 alt.Y("end:Q"),
@@ -162,4 +164,6 @@ class plot:
             + self.chart_text_S
             + self.chart_text_start
         )
-        self.total_chart.configure_axis(grid=False).configure_view(strokeWidth=0)
+        self.total_chart.configure_axis(grid=False).configure_view(
+            strokeWidth=0
+        ).properties(background="#202025")

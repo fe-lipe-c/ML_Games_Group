@@ -113,7 +113,7 @@ $\qquad \qquad \qquad \qquad$ ![Regret](img/regret_1.png)
 
 We can see that the regret is decreasing until it stabilizes below $2.4$. 
 
-We can see another example where the adversary fixed policy is more balanced, like $\pi^{0} = [0.35 ,0.40 , 0.25]$. In this case, the mean for each action is: $\mu_{R} = -0.01$, $\mu_{P} = 0.015$, $\mu_{S} = -0.005 \implies \mu^{*} = \mu_{P}$. Different from the previous example, playing paper as the optimal action is not obvious, observation that reveals itself when we simulate the game, where the learner takes time to find the optimal policy. The figure below shows the performance of a lerner in this environment, through $300$ rounds with a exploitation rate of $0.4$.
+We can see another example where the adversary fixed policy is more balanced, like $\pi^{0} = [0.35 ,0.40 , 0.25]$. In this case, the mean for each action is: $\mu_{R} = -0.01$, $\mu_{P} = 0.015$, $\mu_{S} = -0.005 \implies \mu^{*} = \mu_{P}$. Different from the previous example, playing paper as the optimal action is not obvious, observation that reveals itself when we simulate the game, where the learner takes time to find the optimal policy. The figure below shows the performance of a lerner in this environment, through $300$ rounds with a exploitation rate of $0.4$. We can see that after $300$ rounds the learner is still not playing the optimal action, but the regret is decreasing, nevertheless.
 
 $\qquad \qquad \qquad \qquad$ ![Policy Path - Regret](img/path_regret_2.png)
 

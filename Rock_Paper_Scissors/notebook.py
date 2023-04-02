@@ -6,14 +6,15 @@ import pandas as pd
 import altair as alt
 from collections import deque
 
+# [18, -10, -1]
 player_0 = RPS_player(
-    eta=0.08, init_dist=[18, -10, -1], id=0, deque_size=100, fixed_policy=False
+    eta=0.1, init_dist=[15, -1, 2], id=0, memory_size=1000, fixed_policy=False
 )
 player_1 = RPS_player(
-    eta=0.08, init_dist=[0.8, 0.1, 0.1], deque_size=100, id=1, fixed_policy=False
+    eta=0.1, init_dist=[0.8, 0.1, 0.1], memory_size=1000, id=1, fixed_policy=False
 )
 
-game = RPS_game(T=2000, players=[player_0, player_1], reward_scheme=[0, 0.1, -0.1])
+game = RPS_game(T=1000, players=[player_0, player_1], reward_scheme=[0, 0.1, -0.1])
 game.run()
 
 chart_simplex_0 = plot_simplex.plot(
@@ -23,34 +24,69 @@ chart_simplex_1 = plot_simplex.plot(
     player_1.policy_history, color="red", init_caption=""
 )
 chart = chart_simplex_0.total_chart + chart_simplex_1.total_chart
-chart.save("charts/simplex_path_test_player1.html")
-player_0.weighted_estimator
+# chart_simplex_1.total_chart.configure_view(strokeWidth=0).properties(
+#     background="#202025"
+# ).save("charts/rps_path_.html")
 
-player_0.policy_history[-1]
-player_1.actions_history
-# [0,
-#  1,
-#  0,
-#  1,
-#  0,
-#  1,
+chart.configure_view(strokeWidth=0).properties(background="#202025").save(
+    "charts/rps_path_.html"
+)
 
-player_0.actions_history
-# [0,
-#  0,
-#  0,
-#  0,
-#  1,
-#  2,
-player_1.rewards_history
-# [0,
-#  0.1,
-#  0,
-#  0.1,
-#  -0.1,
-#  -0.1,
+# Plot regret
 
-# eta, init_dist, fixed_policy=False)
+df = pd.DataFrame()
+df["regret"] = player_1.regret_history
+# df["true_rewards"] = game.true_rewards
+df["index"] = df.index
+df["legend"] = "regret"
+
+df_max = pd.DataFrame()
+df_max["regret"] = player_1.regret_max
+df_max["index"] = df_max.index
+df_max["legend"] = "max regret"
+
+df_total = pd.concat([df, df_max])
+
+chart = (
+    alt.Chart(df_total[df_total["regret"] <= 2], title="Regret")
+    .mark_line()
+    .encode(
+        alt.X("index", title="round"),
+        alt.Y("regret", title="pseudo-regret", scale=alt.Scale(domain=(0, 2))),
+        color="legend",
+    )
+)
+chart.configure_axis(
+    grid=False,
+    labelColor="white",
+    titleColor="white",
+).configure_legend(labelColor="white", titleColor="white").configure_title(
+    color="white",
+).configure_view(
+    strokeWidth=0,
+).properties(
+    background="#202025",
+).save(
+    "charts/regret_cumsum.html"
+)
+
+teste = chart_simplex_1.total_chart.properties(
+    width=200, height=200
+) | chart.properties(width=200, height=200)
+teste.configure_axis(
+    grid=False,
+    labelColor="white",
+    titleColor="white",
+).configure_legend(labelColor="white", titleColor="white").configure_title(
+    color="white",
+).configure_view(
+    strokeWidth=0,
+).properties(
+    background="#202025",
+).save(
+    "charts/simplex_regret.html"
+)
+
 
 # Stochastic RPS game
 # T = 300  # game horizon
@@ -65,19 +101,6 @@ chart_simplex.total_chart.save("charts/simplex_path_test.html")
 
 [round(i, 4) for i in game.env_mean]
 
-df = pd.DataFrame()
-df["regret"] = game.regret
-df["true_rewards"] = game.true_rewards
-df["index"] = df.index
-
-chart = (
-    alt.Chart(df)
-    .mark_line()
-    .encode(alt.X("index", title="round"), alt.Y("regret", title="pseudo-regret"))
-)
-chart.save("charts/regret.html")
-teste = chart_simplex.total_chart.properties(width=300, height=300) | chart
-teste.save("charts/simplex_regret.html")
 
 # Adversarial RPS game
 

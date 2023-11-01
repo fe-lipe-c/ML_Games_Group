@@ -1,5 +1,7 @@
 # Artificial Intelligence and Auction Design
 
+The following sections are just a reproduction of key points of the paper 'Artificial Intelligence and Auction Design'. At the end there is Comment section, where I make some considerations.
+
 ## Introduction
 
 Setup: bidding agents with value $v = 1$ over $1$k experiments, where each involve $1$mi auctions.
@@ -32,15 +34,17 @@ While some papers design the learners to keep track of past actions, in the orig
 
 Each agent maximizes the discounted sum of rewards $\mathbb{E} \left[\sum_{t}^{\infty}\gamma ^{t}r_{t}\right]$ where $\gamma < 1$ is the discount factor. Instead of considering the value of Dynamic Programming, Q-learning estimates the action-value function:
 $$
-\begin{equation*}
+\begin{equation}
 	Q (a) = \mathbb{E}\left[r | b^{i}, b^{-i}\right] + \gamma \mathbb{E}\left[\max_{b^{\prime}} Q (b^{\prime})\right]
-\end{equation*}
+\end{equation}
 $$
-**[comment]** I want to stop here. In the bandit formulation, a reward maximizing agent interacts with a environment through an action, receiveing a reward, in each step, that is a function of this action. Through repetition, the agent trys to 'discover' the reward distribution (this can be done through a set of different algorithms), and then, when the agent is confident that she has found the optimal action (or optimal policy), she exploit it.
-**[comment]** In the simplest formulation, the bandit problem doesn't have a state (or you could think of a problem with a single repeting state in each step, making it redundant). A more broad bandit problem incorporates states (also called context in the bandit literature), giving additional information to the agent of what is the reward distribution that she is interacting with. This formulation resembles the RL formulation, except that in the bandit model the states dynamics are independent of the agent's actions.
-**[comment]** If you agree with this argument, you could say that the Q-learning algorithm proposed by the authors is in fact a bandit algorithm. But I wound go to far to state that  
+
+## Paper Comments
+
+I want to stop in this point of the paper. In the bandit formulation, a reward maximizing agent interacts with a environment through an action, receiveing a reward, in each step, that is a function of this action. Through repetition, the agent trys to 'discover' the reward distribution (this can be done through a set of different algorithms), and then, when the agent is confident that she has found the optimal action (or optimal policy), she exploit it.
+
+In the simplest formulation, the bandit problem doesn't have a state (or you could think of a problem with a single repeting state in each step, making it redundant). A more broad bandit problem incorporates states (also called context in the bandit literature), giving additional information to the agent of what is the reward distribution that she is interacting with. This formulation resembles the RL formulation, except that in the bandit model the states dynamics are independent of the agent's actions.
+
+If you agree with this argument, you could say that the Q-learning algorithm proposed by the authors is in fact a bandit algorithm. But I woundn't go too far to state that the problem is a bandit one, I still think it is a RL problem. But unlike the authors, I think that the problem is mis-specified. First, the expectation in (1) is with respect to something. It could
 
 
-# Learning Equilibria in Symmetric Auction Games using Artificial Neural Networks
-
-d

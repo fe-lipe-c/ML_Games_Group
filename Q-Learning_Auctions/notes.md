@@ -1,3 +1,47 @@
+# Q-learning in Auctions 
+
+## Basic RL
+
+An agent interacts with an environment through a sequence of actions, observations and rewards. The agent's goal is to learn a policy that maximizes the expected sum of discounted rewards.
+
+## Environment with more than one agent
+
+Each agent continues to see the environment as usual, considering the other agents as part of the environment. From the perspective of one of the agents, the policies of each other agent is incorporated to the environment dynamics and can be controled through his actions. The difference here is that this policies aren't full observable, and the agent must have some infer it (through the other agents' actions, communication or other signals).
+
+## Auction Setup
+
+The auction framework is a simple game that can be challeging to learn. In its more simple formulation, one auctionner offers a single good, which he values at zero, and two learning bidders make bids to win the good. At each round, each bidder chooses a policy, from which an action will be drawn, an auction rule determines the winner (first-price, seconde-price) and each agent updates its policy through some learning algorithm. 
+
+Although the actions of each bidder is influencing in the others' policies, the observations that each bidder has access to are not controllable (two of these observations, that are part of the state, is the number of bidders that participates in the round and the private value of each bidder, two pieces of information that even if the bidders had access to, they can't influence in their dynamics). 
+
+Then, in its simplest formulation, the auction problem falls in the Bandit framework.
+
+## Auctions with winning bid observation 
+
+If in the auction rules we add that at the end of each round the winner's bid is revealed to all bidders, then we can use the RL framework, since know the bidder can inflence the other bidders' policies through the winning bid.
+
+### RL Setup
+
+- First-price auction
+- State_i: round((winning_bid / bidder_i.private_value) * 10)
+- Reward: 0 (loser) ; winner.private_value - winning_bid (winner)
+- Action: $a \in [0,1]$ -> percentage of private value 
+- Bid: $b = a * bidder_i.private_value$
+
+- 2 bidders
+- Private value constant and symmetric
+
+#### Results
+
+- Tit for tat: at each round the bidder observes the winning bid. If it is low he will bid low. If is high he will bid high. Since he can't see the others' bid, only the winning one, the bidding trajectory is ascending.
+
+## Using DRL
+
+Use a policy gradient algorithm with a Beta distribution as the bidders' policy. 
+
+'Improving Stochastic Policy Gradients in Continous Control with DRL using Beta Distribution'
+
+
 # Artificial Intelligence and Auction Design
 
 The following sections are just a reproduction of key points of the paper 'Artificial Intelligence and Auction Design'. At the end there is Comment section, where I make some considerations.

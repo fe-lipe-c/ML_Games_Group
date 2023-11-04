@@ -1,1 +1,3 @@
-In a traditional RL problem 
+### The Model
+
+

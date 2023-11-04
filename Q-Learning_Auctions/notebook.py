@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import altair as alt
 from auction import auction
 
@@ -7,9 +8,14 @@ max_bid = 100
 alpha = 0.1
 gamma = 1
 epsilon = 0.9
-# def __init__(self, n_bidders, max_bid, alpha, gamma, epsilon):
-a = auction(n_bidders, max_bid, alpha, gamma, epsilon)
+
+pv_type = "uniform"
+pv_dynamics = True
+
+# def __init__(self, n_bidders, pv_type, pv_dynamics, max_bid, alpha, gamma, epsilon):
+a = auction(n_bidders, pv_type, pv_dynamics, max_bid, alpha, gamma, epsilon)
 a.run(10000, auction_alpha=1)
+
 a.bidders[0].states[-10:]
 a.bidders[1].states[-10:]
 a.bidders[0].actions
@@ -26,8 +32,9 @@ a.bidders[1].epsilon
 (18 / 100) * 10
 round((winning_bid / self.max_bid) * 10)
 a.bidders[0].Q
-a.bidders[0].Q[8, :]
-a.bidders[1].Q[10, :]
+[round(i, 2) for i in a.bidders[0].Q[9, :]]
+a.bidders[0].Q[3, :]
+a.bidders[1].Q[4, :]
 np.max(a.bidders[1].Q[2, :])
 
 for i in range(11):
@@ -82,3 +89,14 @@ state
 # ] + self.alpha * (
 #     reward + self.gamma * np.max(self.Q[next_state, :])
 # )
+
+
+Q = np.zeros((3, 3, 3))
+for i in range(3):
+    for j in range(3):
+        for t in range(3):
+            n = random.randint(0, 20)
+            Q[i, j, t] = n
+
+Q[1, 0, 0]
+Q[(1, 0), 0]

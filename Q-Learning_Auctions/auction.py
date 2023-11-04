@@ -4,7 +4,7 @@ import pandas as pd
 
 
 class bidder:
-    def __init__(self, id, pv_type, alpha, gamma, epsilon):
+    def __init__(self, id, alpha, gamma, epsilon):
         self.id = id
         self.alpha = alpha
         self.gamma = gamma
@@ -20,7 +20,7 @@ class bidder:
             if pv_type == "constant":
                 self.private_value = max_bid * pv
             elif pv_type == "uniform":
-                self.private_value = random.randint(0, max_bid)
+                self.private_value = random.randint(10, max_bid - 10)
 
         else:
             if round == 0:
@@ -67,7 +67,13 @@ class auction:
         self.pv_dynamics = pv_dynamics
         self.pv_type = pv_type
         self.bidders = [
-            bidder(i, pv_type, max_bid, alpha, gamma, epsilon) for i in range(n_bidders)
+            bidder(
+                i,
+                alpha,
+                gamma,
+                epsilon,
+            )
+            for i in range(n_bidders)
         ]
 
     def winner_rule(self):
@@ -113,7 +119,12 @@ class auction:
                     reward = 0
 
                 # state = round((winning_bid / self.max_bid) * 10)
-                state = round((winning_bid / b.private_value) * 10)
+                # state = min(round((winning_bid / b.private_value) * 10), 10)
+                # Get the bid from the opponent bidder
+                state = min(
+                    round((self.bidders[1 - b.id].bids[-1] / b.private_value) * 10),
+                    10,
+                )
                 if state > 10:
                     print("error")
                     return

@@ -1,3 +1,5 @@
+import mani
+
 # Playing auctions through  Q-Learning
 
 This post has the objective of implementing a Q-Learning algorithm in an auction environment. The aution theory is one of the more important fields in economics, and it has been studied for a long time. This theory studies the behavior of agents in auctions, and one of its main objectives is to design optimal auctions. Usually this study is made in a static way, generally in one-shot auctions. One of the goals of this paper is to examine the behavior of a particular set of learning agents in sequential auctions, using only the reinforcement learning framework and comparing the results with the expected economic theory outcome.

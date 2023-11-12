@@ -13,7 +13,8 @@ class bidder:
         self.bids = []
         self.states = []
         self.rewards = []
-        self.Q = np.zeros((11, 11))
+        self.Q = np.ones((11, 11, 11)) * 10  # (state_1, state_2, action)
+        self.Q_count = np.zeros((11, 11, 11))  # (state_1, state_2, action)
 
     def update_private_value(self, round, pv, pv_type, pv_dynamics, max_bid):
         if pv_dynamics is True:
@@ -35,11 +36,16 @@ class bidder:
         if round / total_rounds > 0.8:
             self.epsilon = 0.0
 
-    def policy(self, state):
+    def policy(self, state_1, state_2):
         if random.random() < self.epsilon:
             action = random.randint(0, 10) / 10
         else:
-            action = np.argmax(self.Q[state, :]) / 10
+            value_max = np.max(self.Q[state_1, state_2, :])
+            max_index = [
+                i for i, j in enumerate(self.Q[state_1, state_2, :]) if j == value_max
+            ]
+            action = random.choice(max_index) / 10
+            # action = np.argmax(self.Q[state_1, state_2, :]) / 10
         return action
 
     def q_update(self):
@@ -48,16 +54,11 @@ class bidder:
             next_state = self.states[-1]
             reward = self.rewards[-2]
             action = self.actions[-2]
-            # if reward == 0:
-            #     for s in range(state, 11):
-            #         self.Q[s, action] = (1 - self.alpha) * self.Q[
-            #             s, action
-            #         ] + self.alpha * (
-            #             reward + self.gamma * np.max(self.Q[next_state, :])
-            #         )
-            self.Q[state, action] = (1 - self.alpha) * self.Q[
-                state, action
-            ] + self.alpha * (reward + self.gamma * np.max(self.Q[next_state, :]))
+            self.Q[state[0], state[1], action] = (1 - self.alpha) * self.Q[
+                state[0], state[1], action
+            ] + self.alpha * (
+                reward + self.gamma * np.max(self.Q[next_state[0], next_state[1], :])
+            )
 
 
 class auction:
@@ -78,21 +79,14 @@ class auction:
 
     def winner_rule(self):
         bids = [b.bids[-1] for b in self.bidders]
+        max_bid = max(bids)
+        max_index = [i for i, j in enumerate(bids) if j == max_bid]
+        winner_bidder = random.choice(max_index)
+        best_bid = bids[winner_bidder]
+        bids.pop(winner_bidder)
+        worst_bid = min(bids)
 
-        if bids[0] == bids[1]:
-            if len(self.bidders) > 2:
-                print("Only 2 bidders supported")
-                return
-
-            r = random.random()
-            if r > 0.5:
-                winner_bidder = 0
-            else:
-                winner_bidder = 1
-        else:
-            winner_bidder = np.argmax(bids)
-
-        return winner_bidder, np.max(bids)
+        return winner_bidder, best_bid, worst_bid
 
     def run(self, periods, auction_alpha):
         for t in range(periods):
@@ -102,7 +96,7 @@ class auction:
                     t, pv, self.pv_type, self.pv_dynamics, self.max_bid
                 )
                 if t != 0:
-                    action = b.policy(b.states[-1])  # * b.private_value
+                    action = b.policy(b.states[-1][0], b.states[-1][1])
                 else:
                     action = random.randint(0, 10) / 10  # * b.private_value
 
@@ -110,7 +104,7 @@ class auction:
                 b.actions.append(int(action * 10))
                 b.bids.append(bid)
 
-            winner_bidder, winning_bid = self.winner_rule()
+            winner_bidder, winning_bid, worst_bid = self.winner_rule()
 
             for b in self.bidders:
                 if b.id == winner_bidder:
@@ -118,20 +112,16 @@ class auction:
                 else:
                     reward = 0
 
-                # state = round((winning_bid / self.max_bid) * 10)
-                # state = min(round((winning_bid / b.private_value) * 10), 10)
-                # Get the bid from the opponent bidder
-                state = min(
-                    round((self.bidders[1 - b.id].bids[-1] / b.private_value) * 10),
+                state_1 = min(
+                    round((winning_bid / b.private_value) * 10),
                     10,
                 )
-                if state > 10:
-                    print("error")
-                    return
+                state_2 = min(
+                    round((worst_bid / b.private_value) * 10),
+                    10,
+                )
 
-                b.states.append(state)
+                b.states.append((state_1, state_2))
                 b.rewards.append(reward)
                 b.q_update()
                 b.update_epsilon(t, periods)
-            # print(self.bidders[0].epsilon)
-            # print(f'Round {t} epsilon: {b.epsilon}')

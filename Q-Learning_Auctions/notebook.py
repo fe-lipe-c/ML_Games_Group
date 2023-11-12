@@ -3,42 +3,48 @@ import random
 import altair as alt
 from auction import auction
 
-n_bidders = 2
+n_bidders = 3
 max_bid = 100
 alpha = 0.1
-gamma = 1
+gamma = 0.9
 epsilon = 0.9
 
-pv_type = "uniform"
-pv_dynamics = True
+pv_type = "constant"
+pv_dynamics = False
 
 # def __init__(self, n_bidders, pv_type, pv_dynamics, max_bid, alpha, gamma, epsilon):
 a = auction(n_bidders, pv_type, pv_dynamics, max_bid, alpha, gamma, epsilon)
-a.run(10000, auction_alpha=1)
+a.run(100000, auction_alpha=1)
 
-a.bidders[0].states[-10:]
-a.bidders[1].states[-10:]
-a.bidders[0].actions
+a.bidders[0].states[100:110]
+a.bidders[1].states[100:110]
+a.bidders[2].states[100:110]
+a.bidders[2].actions[100:110]
 a.bidders[0].actions[-10:]
 a.bidders[1].actions[-10:]
+a.bidders[2].actions[-10:]
 a.bidders[0].private_value
 a.bidders[1].private_value
-a.bidders[0].bids
-a.bidders[1].bids
 a.bidders[1].bids[-10:]
-a.bidders[0].rewards[-100:]
-a.bidders[1].rewards[-100:]
-a.bidders[1].epsilon
-(18 / 100) * 10
-round((winning_bid / self.max_bid) * 10)
-a.bidders[0].Q
 [round(i, 2) for i in a.bidders[0].Q[9, :]]
 a.bidders[0].Q[3, :]
-a.bidders[1].Q[4, :]
+a.bidders[1].Q[5, 6, :]
 np.max(a.bidders[1].Q[2, :])
 
 for i in range(11):
-    print(f"state {i} -> {np.argmax(a.bidders[0].Q[i, :])}")
+    for j in range(11):
+        if i < j:
+            continue
+
+        value_max = np.max(a.bidders[0].Q[i, j, :])
+        max_index = [i for i, j in enumerate(a.bidders[0].Q[i, j, :]) if j == value_max]
+        print(f"state {i, j} -> {max_index}")
+
+
+a.bidders[0]
+np.argmax
+
+# action = np.argmax(self.Q[state_1, state_2, :]) / 10
 
 v = 2000
 rounds = list(range(0, v))
@@ -91,12 +97,17 @@ state
 # )
 
 
+n_bid
+# New matrix with n_bid dimentsion
+Q = np.zeros((n_bid, n_bid))
+
 Q = np.zeros((3, 3, 3))
+Q
 for i in range(3):
     for j in range(3):
         for t in range(3):
             n = random.randint(0, 20)
             Q[i, j, t] = n
 
-Q[1, 0, 0]
-Q[(1, 0), 0]
+t = [random.randint(0, 4) for i in range(10)]
+t

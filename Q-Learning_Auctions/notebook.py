@@ -9,12 +9,12 @@ alpha = 0.1
 gamma = 1
 epsilon = 0.9
 
-pv_type = "uniform"
-pv_dynamics = True
+pv_type = "constant"
+pv_dynamics = False
 
 # def __init__(self, n_bidders, pv_type, pv_dynamics, max_bid, alpha, gamma, epsilon):
 a = auction(n_bidders, pv_type, pv_dynamics, max_bid, alpha, gamma, epsilon)
-a.run(10000, auction_alpha=1)
+a.run(100000, auction_alpha=1)
 
 a.bidders[0].states[-10:]
 a.bidders[1].states[-10:]

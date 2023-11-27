@@ -1,6 +1,5 @@
 import random
 import numpy as np
-import pandas as pd
 
 
 class bidder:
@@ -38,8 +37,12 @@ class bidder:
     def policy(self, state):
         if random.random() < self.epsilon:
             action = random.randint(0, 10) / 10
+        # else:
+        #     action = np.argmax(self.Q[state, :]) / 10
         else:
-            action = np.argmax(self.Q[state, :]) / 10
+            value_max = np.max(self.Q[state, :])
+            max_index = [i for i, j in enumerate(self.Q[state, :]) if j == value_max]
+            action = random.choice(max_index) / 10
         return action
 
     def q_update(self):
@@ -48,13 +51,6 @@ class bidder:
             next_state = self.states[-1]
             reward = self.rewards[-2]
             action = self.actions[-2]
-            # if reward == 0:
-            #     for s in range(state, 11):
-            #         self.Q[s, action] = (1 - self.alpha) * self.Q[
-            #             s, action
-            #         ] + self.alpha * (
-            #             reward + self.gamma * np.max(self.Q[next_state, :])
-            #         )
             self.Q[state, action] = (1 - self.alpha) * self.Q[
                 state, action
             ] + self.alpha * (reward + self.gamma * np.max(self.Q[next_state, :]))
@@ -96,7 +92,8 @@ class auction:
 
     def run(self, periods, auction_alpha):
         for t in range(periods):
-            pv = random.random()
+            # draw value of beta distribution
+            pv = round(np.random.beta(12, 12), 2)
             for b in self.bidders:
                 b.update_private_value(
                     t, pv, self.pv_type, self.pv_dynamics, self.max_bid
@@ -125,9 +122,6 @@ class auction:
                     round((self.bidders[1 - b.id].bids[-1] / b.private_value) * 10),
                     10,
                 )
-                if state > 10:
-                    print("error")
-                    return
 
                 b.states.append(state)
                 b.rewards.append(reward)

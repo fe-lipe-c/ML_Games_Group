@@ -13,6 +13,7 @@ class bidder:
         self.states = []
         self.rewards = []
         self.Q = np.zeros((11, 11))
+        self.epsilon_history = []
 
     def update_private_value(self, round, pv, pv_type, pv_dynamics, max_bid):
         if pv_dynamics is True:
@@ -31,8 +32,8 @@ class bidder:
     def update_epsilon(self, round, total_rounds):
         self.epsilon = self.epsilon * (1 - (round / (5 * total_rounds)))
         self.epsilon = max(self.epsilon, 0.10)
-        if round / total_rounds > 0.8:
-            self.epsilon = 0.0
+        # if round / total_rounds > 0.8:
+        #     self.epsilon = 0.0
 
     def policy(self, state):
         if random.random() < self.epsilon:
@@ -80,11 +81,13 @@ class auction:
                 print("Only 2 bidders supported")
                 return
 
-            r = random.random()
-            if r > 0.5:
-                winner_bidder = 0
-            else:
-                winner_bidder = 1
+            # r = random.random()
+            # if r > 0.5:
+            #     winner_bidder = 0
+            # else:
+            #     winner_bidder = 1
+            winner_bidder = random.choice([0, 1])
+
         else:
             winner_bidder = np.argmax(bids)
 
@@ -123,9 +126,12 @@ class auction:
                     10,
                 )
 
+                # state = round((winning_bid / b.private_value) * 10)
+
                 b.states.append(state)
                 b.rewards.append(reward)
                 b.q_update()
                 b.update_epsilon(t, periods)
+                b.epsilon_history.append(b.epsilon)
             # print(self.bidders[0].epsilon)
             # print(f'Round {t} epsilon: {b.epsilon}')

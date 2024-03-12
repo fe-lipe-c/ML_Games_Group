@@ -4,9 +4,9 @@ import altair as alt
 from auction import auction
 
 n_bidders = 2
-max_bid = 100
-alpha = 0.1
-gamma = 1
+max_bid = 1
+alpha = 0.01
+gamma = 0.9
 epsilon = 0.9
 
 pv_type = "constant"
@@ -16,6 +16,7 @@ pv_dynamics = False
 a = auction(n_bidders, pv_type, pv_dynamics, max_bid, alpha, gamma, epsilon)
 a.run(100000, auction_alpha=1)
 
+a.bidders[0].epsilon_history[30000]
 a.bidders[0].states[-10:]
 a.bidders[1].states[-10:]
 a.bidders[0].actions
@@ -33,8 +34,8 @@ a.bidders[1].epsilon
 round((winning_bid / self.max_bid) * 10)
 a.bidders[0].Q
 [round(i, 2) for i in a.bidders[0].Q[9, :]]
-a.bidders[0].Q[3, :]
-a.bidders[1].Q[4, :]
+a.bidders[0].Q[10, :]
+a.bidders[1].Q[5, :]
 np.max(a.bidders[1].Q[2, :])
 
 for i in range(11):
